@@ -10,9 +10,26 @@ import (
 
 func main() {
 
-	// var toDelete string = "node_modules"
+	dirToClean := "../"
+	var toDelete []string = []string{"node_modules"}
+	RootDir := readADir(dirToClean)
 
-	printDir("../")
+}
+
+func recursiveCleaner(rootDir []fs.DirEntry, toDelete []string) {
+
+	extraDirs := []fs.DirEntry{}
+
+	for _, dirOrFile := range rootDir {
+
+		isTarget := false
+
+		// for _,
+
+		if dirOrFile.IsDir() {
+			extraDirs = append(extraDirs, dirOrFile)
+		}
+	}
 
 }
 
