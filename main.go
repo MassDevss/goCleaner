@@ -8,43 +8,74 @@ import (
 	h "github.com/ManuelsSaNt/goCleaner/helpers"
 )
 
+var dirToSwap string = ""
+var deppest int = 0
+
 func main() {
 
-	dirToClean := "../"
-	var toDelete []string = []string{"node_modules"}
-	RootDir := readADir(dirToClean)
+	dirToClean := ".."
+	dirToSwap = dirToClean
+
+	// var toDelete []string = []string{"node_modules"}
+	// baseDir := readADir(dirToClean)
+
+	// recursiveCleaner(baseDir, toDelete)
+	recursiveNavigator(dirToClean)
+
+	// f.Println()
 
 }
 
-func recursiveCleaner(rootDir []fs.DirEntry, toDelete []string) {
+func recursiveNavigator(setterPath string) {
 
-	extraDirs := []fs.DirEntry{}
+	baseDirCollection := readADir(setterPath)
+	var directories = []fs.DirEntry{}
 
-	for _, dirOrFile := range rootDir {
+	for _, childDir := range baseDirCollection {
 
-		isTarget := false
-
-		// for _,
-
-		if dirOrFile.IsDir() {
-			extraDirs = append(extraDirs, dirOrFile)
+		if childDir.IsDir() && childDir.Name() != "node_modules" {
+			directories = append(directories, childDir)
 		}
+
+		f.Println(repeat(" ", deppest) + childDir.Name())
+	}
+
+	// deppest++
+
+	for _, parent := range directories {
+
+		parentPath := setterPath + "/" + parent.Name()
+
+		f.Println("direcotry: " + parent.Name())
+		f.Println("path: " + parentPath)
+
+		recursiveNavigator(parentPath)
 	}
 
 }
 
 func readADir(path string) []fs.DirEntry {
-	dir, err := os.ReadDir("../")
+	dir, err := os.ReadDir(path)
 	h.ManageErr(err)
 
 	return dir
 }
 
 func printDir(path string) {
-	dir, err := os.ReadDir("../")
+	dir, err := os.ReadDir(path)
 	h.ManageErr(err)
 
 	for _, dirOrFile := range dir {
 		f.Println(dirOrFile)
 	}
+}
+
+func repeat(toRepeat string, times int) string {
+	newTxt := ""
+
+	for i := 0; i < times; i++ {
+		newTxt += toRepeat
+	}
+
+	return newTxt
 }
