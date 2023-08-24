@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	f "fmt"
 	"io/fs"
 	"os"
 	"strings"
@@ -14,10 +15,19 @@ var dirToSwap string = ""
 
 func main() {
 
+	helpFlag := flag.Bool("help", false, "Help comand use to show information")
 	// ! config for flags
 	rootSearch := flag.String("root", "", "the initial dir for search the delete files.")
 	deleteFileOrDir := flag.String("target", "", "The files to delete (you can add more of one using ',')")
 	flag.Parse()
+
+	if *helpFlag {
+		defer func() {
+			recover()
+		}()
+		f.Println("\n-help\n\tHelp comand use to show information \n-root\n\tthe initial dir for search the delete files. \n-target\n\t The files to delete (you can add more of one using ',')\n")
+		panic("")
+	}
 
 	dirToClean := *rootSearch
 	dirToSwap = dirToClean
@@ -40,10 +50,10 @@ func main() {
 	}
 	//! #
 
-	recursiveNavigator(dirToClean)
+	recursiveNavigator(dirToClean, cleanTargets)
 }
 
-func recursiveNavigator(setterPath string) {
+func recursiveNavigator(setterPath string, deleteTargets []string) {
 
 	baseDirCollection := readADir(setterPath)
 
@@ -61,24 +71,25 @@ func recursiveNavigator(setterPath string) {
 			//* write your logic here
 
 			// use for to loop the delete values
-			if strings.Contains(parentPath, "node_modules") {
-				splitedPath := strings.Split(parentPath, "/")
+			for _, delTarget := range deleteTargets {
+				if strings.Contains(parentPath, delTarget) {
 
-				if splitedPath[len(splitedPath)-1] == "node_modules" {
+					splitedPath := strings.Split(parentPath, "/")
+					if splitedPath[len(splitedPath)-1] == delTarget {
 
-					delErr := os.RemoveAll(parentPath)
+						delErr := os.RemoveAll(parentPath)
 
-					if delErr != nil {
-						// panic("An error ocurres deleting a file: " + delErr.Error())
+						if delErr != nil {
+							panic("An error ocurres deleting a file: " + delErr.Error())
+						}
 					}
-
 				}
 			}
 
 			//* write your logic here
 
 			// ! RECURSIVE
-			recursiveNavigator(parentPath)
+			recursiveNavigator(parentPath, deleteTargets)
 		}
 
 		// ! this content here only shows you the files formated
